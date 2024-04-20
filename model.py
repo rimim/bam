@@ -85,6 +85,7 @@ class Model(BaseModel):
         self,
         load_dependent: bool = False,
         stribeck: bool = False,
+        load_exp: bool = False,
         name: str = None,
     ):
         self.name = name
@@ -109,6 +110,7 @@ class Model(BaseModel):
 
         # Load-dependent friction, again base is always here and stribeck is added when not moving [Nm]
         if self.load_dependent:
+            self.load_exp = Parameter(0.5, 0.25, 3.0, optimize=load_exp)
             self.load_friction_base = Parameter(0.05, 0.0, 0.2)
 
             if self.stribeck:
@@ -140,6 +142,7 @@ class Model(BaseModel):
     ) -> tuple:
         # Torque applied to the gearbox
         gearbox_torque = np.abs(external_torque - motor_torque)
+        gearbox_torque = gearbox_torque ** self.load_exp.value
 
         if self.stribeck:
             # Stribeck coeff (1 when stopped to 0 when moving)
@@ -232,6 +235,7 @@ models = {
     "m2": lambda: Model(name="m2", stribeck=True),
     "m3": lambda: Model(name="m3", load_dependent=True),
     "m4": lambda: Model(name="m4", load_dependent=True, stribeck=True),
+    "m5": lambda: Model(name="m5", load_dependent=True, stribeck=True, load_exp=True),
 }
 
 
