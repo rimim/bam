@@ -194,7 +194,7 @@ class Model(BaseModel):
 
         # Computing damping
         damping = self.friction_viscous.value
-        damping += self.R.value / (self.kt.value**2)
+        damping += (self.kt.value**2) / self.R.value
         print(f" - Damping: {damping}")
 
         # Computing frictionloss
