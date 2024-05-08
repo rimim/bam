@@ -96,10 +96,12 @@ class Model(BaseModel):
 
         # Load-dependent friction, again base is always here and stribeck is added when not moving [Nm]
         if self.load_dependent:
-            self.load_friction_base = Parameter(0.05, 0.0, 0.2)
+            self.load_friction_opposition_base = Parameter(0.05, 0.0, 0.2)
+            self.load_friction_through_base = Parameter(0.05, 0.0, 0.2)
 
             if self.stribeck:
-                self.load_friction_stribeck = Parameter(0.05, 0.0, 1.0)
+                self.load_friction_opposition_stribeck = Parameter(0.05, 0.0, 1.0)
+                self.load_friction_through_stribeck = Parameter(0.05, 0.0, 1.0)
 
         if self.stribeck:
             # Stribeck velocity [rad/s] and curvature
@@ -113,9 +115,18 @@ class Model(BaseModel):
         self, motor_torque: float, external_torque: float, dtheta: float
     ) -> tuple:
         # Torque applied to the gearbox
-        gearbox_torque = 0.0
+        gearbox_torque_opposition = 0.0
+        gearbox_torque_through = 0.0
+
         if np.sign(external_torque) != np.sign(motor_torque):
-            gearbox_torque = min(abs(external_torque), abs(motor_torque))
+            gearbox_torque_opposition = min(abs(external_torque), abs(motor_torque))
+            gearbox_torque_through = (
+                max(abs(external_torque), abs(motor_torque)) - gearbox_torque_opposition
+            )
+        else:
+            gearbox_torque_through = max(abs(external_torque), abs(motor_torque)) - min(
+                abs(external_torque), abs(motor_torque)
+            )
 
         if self.stribeck:
             # Stribeck coeff (1 when stopped to 0 when moving)
@@ -126,14 +137,26 @@ class Model(BaseModel):
         # Static friction
         frictionloss = self.friction_base.value
         if self.load_dependent:
-            frictionloss += self.load_friction_base.value * gearbox_torque
+            frictionloss += (
+                self.load_friction_opposition_base.value * gearbox_torque_opposition
+            )
+            frictionloss += (
+                self.load_friction_through_base.value * gearbox_torque_through
+            )
 
         if self.stribeck:
             frictionloss += stribeck_coeff * self.friction_stribeck.value
 
             if self.load_dependent:
                 frictionloss += (
-                    self.load_friction_stribeck.value * gearbox_torque * stribeck_coeff
+                    self.load_friction_opposition_stribeck.value
+                    * gearbox_torque_opposition
+                    * stribeck_coeff
+                )
+                frictionloss += (
+                    self.load_friction_through_stribeck.value
+                    * gearbox_torque_through
+                    * stribeck_coeff
                 )
 
         # Viscous friction
