@@ -101,6 +101,7 @@ class Model(BaseModel):
             if self.directional:
                 self.load_friction_motor = Parameter(0.05, 0.0, 0.5)
                 self.load_friction_external = Parameter(0.05, 0.0, 0.5)
+                self.load_friction_same = Parameter(0.05, 0.0, 0.5)
             else:
                 self.load_friction_base = Parameter(0.05, 0.0, 0.2)
 
@@ -108,6 +109,7 @@ class Model(BaseModel):
                 if self.directional:
                     self.load_friction_motor_stribeck = Parameter(0.05, 0.0, 1.0)
                     self.load_friction_external_stribeck = Parameter(0.05, 0.0, 1.0)
+                    self.load_friction_same_stribeck = Parameter(0.05, 0.0, 1.0)
                 else:
                     self.load_friction_stribeck = Parameter(0.05, 0.0, 1.0)
 
@@ -123,18 +125,7 @@ class Model(BaseModel):
         self, motor_torque: float, external_torque: float, dtheta: float
     ) -> tuple:
         # Torque applied to the gearbox
-        if self.directional:
-            gearbox_torque = np.abs(
-                external_torque * self.load_friction_external.value
-                - motor_torque * self.load_friction_motor.value
-            )
-            if self.stribeck:
-                gearbox_torque_stribeck = np.abs(
-                    external_torque * self.load_friction_external_stribeck.value
-                    - motor_torque * self.load_friction_motor_stribeck.value
-                )
-        else:
-            gearbox_torque = np.abs(external_torque - motor_torque)
+        gearbox_torque = np.abs(external_torque - motor_torque)
 
         if self.stribeck:
             # Stribeck coeff (1 when stopped to 0 when moving)
@@ -146,7 +137,15 @@ class Model(BaseModel):
         frictionloss = self.friction_base.value
         if self.load_dependent:
             if self.directional:
-                frictionloss += gearbox_torque
+                if np.sign(motor_torque) == np.sign(external_torque):
+                    frictionloss += self.load_friction_same.value * gearbox_torque
+                else:
+                    if np.abs(motor_torque) > np.abs(external_torque):
+                        frictionloss += self.load_friction_motor.value * gearbox_torque
+                    else:
+                        frictionloss += (
+                            self.load_friction_external.value * gearbox_torque
+                        )
             else:
                 frictionloss += self.load_friction_base.value * gearbox_torque
 
@@ -155,7 +154,25 @@ class Model(BaseModel):
 
             if self.load_dependent:
                 if self.directional:
-                    frictionloss += gearbox_torque_stribeck * stribeck_coeff
+                    if np.sign(motor_torque) == np.sign(external_torque):
+                        frictionloss += (
+                            self.load_friction_same_stribeck.value
+                            * gearbox_torque
+                            * stribeck_coeff
+                        )
+                    else:
+                        if np.abs(motor_torque) > np.abs(external_torque):
+                            frictionloss += (
+                                self.load_friction_motor_stribeck.value
+                                * gearbox_torque
+                                * stribeck_coeff
+                            )
+                        else:
+                            frictionloss += (
+                                self.load_friction_external_stribeck.value
+                                * gearbox_torque
+                                * stribeck_coeff
+                            )
                 else:
                     frictionloss += (
                         self.load_friction_stribeck.value
@@ -178,10 +195,7 @@ models = {
     "m3": lambda: Model(name="m3", load_dependent=True),
     "m4": lambda: Model(name="m4", load_dependent=True, stribeck=True),
     "m5": lambda: Model(
-        name="m5",
-        load_dependent=True,
-        directional=True,
-        stribeck=True
+        name="m5", load_dependent=True, directional=True, stribeck=True
     ),
 }
 
