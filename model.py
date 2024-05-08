@@ -113,7 +113,9 @@ class Model(BaseModel):
         self, motor_torque: float, external_torque: float, dtheta: float
     ) -> tuple:
         # Torque applied to the gearbox
-        gearbox_torque = np.abs(external_torque - motor_torque)
+        gearbox_torque = 0.0
+        if np.sign(external_torque) != np.sign(motor_torque):
+            gearbox_torque = min(abs(external_torque), abs(motor_torque))
 
         if self.stribeck:
             # Stribeck coeff (1 when stopped to 0 when moving)
