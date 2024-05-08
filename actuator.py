@@ -29,7 +29,7 @@ class Actuator:
     def compute_control(self, position_error: float, dq: float) -> float | None:
         raise NotImplementedError
 
-    def compute_torque(self, control: float | None, dq: float) -> float:
+    def compute_torque(self, control: float | None, q: float, dq: float) -> float:
         raise NotImplementedError
 
     def compute_gravity_torque(self, q: float, mass: float, length: float) -> float:
@@ -77,10 +77,13 @@ class MXActuator(Actuator):
 
         return self.vin * duty_cycle
 
-    def compute_torque(self, control: float | None, dq: float) -> float:
+    def compute_torque(self, control: float | None, q: float, dq: float) -> float:
         # Volts to None means that the motor is disconnected
         if control is None:
             return 0.0
+        
+        phase = q * 200 * 4
+        ratio = np.sin(phase * 2 * np.pi) 
 
         volts = control
 
@@ -90,7 +93,7 @@ class MXActuator(Actuator):
         # Back EMF
         torque -= (self.model.kt.value**2) * dq / self.model.R.value
 
-        return torque
+        return torque * ((2/3) + (1/3) * ratio)
 
     def to_mujoco(self) -> None:
         message.bright("MX Actuator")

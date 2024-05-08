@@ -31,7 +31,7 @@ class Simulate1R:
         Steps the simulation for dt given the applied control
         """
         gravity_torque = self.model.actuator.compute_gravity_torque(self.q, self.mass, self.length)
-        motor_torque = self.model.actuator.compute_torque(control, self.dq)
+        motor_torque = self.model.actuator.compute_torque(control, self.q, self.dq)
         frictionloss, damping = self.model.compute_frictions(
             motor_torque, gravity_torque, self.dq
         )
@@ -118,15 +118,16 @@ class Simulate1R:
 if __name__ == "__main__":
     import pygame
 
-    model = load_model("params.json")
+    model = load_model("params/m4.json")
     sim = Simulate1R(3.500, 0.105, model)
-    sim.reset(-1.5, 0.0)
+    sim.reset(1.5, 0.0)
     while True:
-        sim.step(-2.0, 0.01)
+        print(sim.q)
+        sim.step(2.0, 0.01)
         sim.draw()
         import time
 
-        time.sleep(0.01)
+        # time.sleep(0.01)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
