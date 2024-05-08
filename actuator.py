@@ -95,8 +95,6 @@ class MXActuator(Actuator):
         # Back EMF
         torque -= (self.model.kt.value**2) * dq / self.model.R.value
 
-        print(1 - self.model.dc.value * ratio)
-
         return torque * (1 - self.model.dc.value * ratio)
 
     def to_mujoco(self) -> None:
