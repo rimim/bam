@@ -122,19 +122,23 @@ class Model(BaseModel):
     def compute_frictions(
         self, motor_torque: float, external_torque: float, dtheta: float
     ) -> tuple:
+        gearbox_torque = 0.0
+        gearbox_torque_stribeck = 0.0
+
         # Torque applied to the gearbox
         if self.directional:
-            gearbox_torque = np.abs(
-                external_torque * self.load_friction_external.value
-                - motor_torque * self.load_friction_motor.value
-            )
-            if self.stribeck:
-                gearbox_torque_stribeck = np.abs(
-                    external_torque * self.load_friction_external_stribeck.value
-                    - motor_torque * self.load_friction_motor_stribeck.value
-                )
-        else:
-            gearbox_torque = np.abs(external_torque - motor_torque)
+            if np.sign(external_torque) != np.sign(motor_torque):
+                if abs(external_torque) > abs(motor_torque):
+                    gearbox_torque = abs(motor_torque) * self.load_friction_external.value
+                    if self.strickbeck:
+                        gearbox_torque_stribeck = abs(motor_torque) * self.load_friction_external_stribeck.value
+                else:
+                    gearbox_torque = abs(external_torque) * self.load_friction_motor.value
+                    if self.strickbeck:
+                        gearbox_torque_stribeck = abs(external_torque) * self.load_friction_motor_stribeck.value
+
+            if np.sign(external_torque) != np.sign(motor_torque):
+                gearbox_torque = min(abs(external_torque), abs(motor_torque))
 
         if self.stribeck:
             # Stribeck coeff (1 when stopped to 0 when moving)
