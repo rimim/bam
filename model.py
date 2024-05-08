@@ -130,11 +130,11 @@ class Model(BaseModel):
             if np.sign(external_torque) != np.sign(motor_torque):
                 if abs(external_torque) > abs(motor_torque):
                     gearbox_torque = abs(motor_torque) * self.load_friction_external.value
-                    if self.strickbeck:
+                    if self.stribeck:
                         gearbox_torque_stribeck = abs(motor_torque) * self.load_friction_external_stribeck.value
                 else:
                     gearbox_torque = abs(external_torque) * self.load_friction_motor.value
-                    if self.strickbeck:
+                    if self.stribeck:
                         gearbox_torque_stribeck = abs(external_torque) * self.load_friction_motor_stribeck.value
 
             if np.sign(external_torque) != np.sign(motor_torque):
