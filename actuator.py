@@ -68,6 +68,8 @@ class MXActuator(Actuator):
         # Motor resistance [Ohm]
         self.model.R = Parameter(2.0, 1.0, 3.5)
 
+        self.model.dc = Parameter(0.25, 0.0, 1/3)
+
     def control_unit(self) -> str:
         return "volts"
 
@@ -82,7 +84,7 @@ class MXActuator(Actuator):
         if control is None:
             return 0.0
         
-        phase = q * 200 * 4
+        phase = q * 250 * 4
         ratio = np.sin(phase * 2 * np.pi) 
 
         volts = control
@@ -93,7 +95,9 @@ class MXActuator(Actuator):
         # Back EMF
         torque -= (self.model.kt.value**2) * dq / self.model.R.value
 
-        return torque * ((2/3) + (1/3) * ratio)
+        print(1 - self.model.dc.value * ratio)
+
+        return torque * (1 - self.model.dc.value * ratio)
 
     def to_mujoco(self) -> None:
         message.bright("MX Actuator")
