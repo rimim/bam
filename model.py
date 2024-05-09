@@ -131,21 +131,10 @@ class Model(BaseModel):
         self, motor_torque: float, external_torque: float, dtheta: float
     ) -> tuple:
         # Torque applied to the gearbox
-        if self.directional:
-            gearbox_torque = np.abs(
-                external_torque * self.load_friction_external.value
-                - motor_torque * self.load_friction_motor.value
-            )
-            if self.stribeck:
-                gearbox_torque_stribeck = np.abs(
-                    external_torque * self.load_friction_external_stribeck.value
-                    - motor_torque * self.load_friction_motor_stribeck.value
-                )
-        else:
-            gearbox_torque = np.abs(external_torque - motor_torque)
+        gearbox_torque = min(abs(external_torque), abs(motor_torque))
 
         if self.quadratic:
-            gearbox_torque2 = min(abs(external_torque), abs(motor_torque)) ** 2
+            gearbox_torque2 = gearbox_torque ** 2
 
         if self.stribeck:
             # Stribeck coeff (1 when stopped to 0 when moving)
@@ -157,7 +146,10 @@ class Model(BaseModel):
         frictionloss = self.friction_base.value
         if self.load_dependent:
             if self.directional:
-                frictionloss += gearbox_torque
+                if abs(external_torque) > abs(motor_torque):
+                        frictionloss += gearbox_torque * self.load_friction_motor_stribeck.value
+                else:
+                    frictionloss += gearbox_torque * self.load_friction_external_stribeck.value
             else:
                 frictionloss += self.load_friction_base.value * gearbox_torque
 
@@ -169,7 +161,18 @@ class Model(BaseModel):
 
             if self.load_dependent:
                 if self.directional:
-                    frictionloss += gearbox_torque_stribeck * stribeck_coeff
+                    if abs(external_torque) > abs(motor_torque):
+                        frictionloss += (
+                            self.load_friction_motor_stribeck.value
+                            * gearbox_torque
+                            * stribeck_coeff
+                        )
+                    else:
+                        frictionloss += (
+                            self.load_friction_external_stribeck.value
+                            * gearbox_torque
+                            * stribeck_coeff
+                        )
                 else:
                     frictionloss += (
                         self.load_friction_stribeck.value
