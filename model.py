@@ -112,7 +112,7 @@ class Model(BaseModel):
                     self.load_friction_external_stribeck = Parameter(0.05, 0.0, 1.0)
                 else:
                     self.load_friction_stribeck = Parameter(0.05, 0.0, 1.0)
-            
+
                 if self.quadratic:
                     self.load_friction_motor_quad = Parameter(0.05, 0.0, 1.0)
                     self.load_friction_external_quad = Parameter(0.05, 0.0, 1.0)
@@ -170,10 +170,10 @@ class Model(BaseModel):
                     )
 
                 if self.quadratic:
-                    if abs(external_torque) < abs(motor_torque):
-                        gearbox_torque2 = self.load_friction_external_quad.value * abs(external_torque)**2
-                    else:
-                        gearbox_torque2 = self.load_friction_motor_quad.value * abs(motor_torque)**2
+                    gearbox_torque2 = (
+                        self.load_friction_external_quad.value * external_torque
+                        - self.load_friction_motor_quad.value * motor_torque
+                    ) ** 2
 
                     frictionloss += gearbox_torque2 * stribeck_coeff
 
