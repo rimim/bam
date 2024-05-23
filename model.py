@@ -101,15 +101,15 @@ class Model(BaseModel):
         # Load-dependent friction, again base is always here and stribeck is added when not moving [Nm]
         if self.load_dependent:
             if self.directional:
-                self.load_friction_motor = Parameter(0.05, 0.0, 0.5)
-                self.load_friction_external = Parameter(0.05, 0.0, 0.5)
+                self.load_friction_motor = Parameter(0.05, 0.0, 1.5)
+                self.load_friction_external = Parameter(0.05, 0.0, 1.5)
             else:
                 self.load_friction_base = Parameter(0.05, 0.0, 0.2)
 
             if self.stribeck:
                 if self.directional:
-                    self.load_friction_motor_stribeck = Parameter(0.05, 0.0, 1.0)
-                    self.load_friction_external_stribeck = Parameter(0.05, 0.0, 1.0)
+                    self.load_friction_motor_stribeck = Parameter(0.05, 0.0, 3.0)
+                    self.load_friction_external_stribeck = Parameter(0.05, 0.0, 3.0)
                 else:
                     self.load_friction_stribeck = Parameter(0.05, 0.0, 1.0)
             
