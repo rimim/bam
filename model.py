@@ -55,8 +55,7 @@ class Model():
                     self.load_friction_stribeck = Parameter(0.05, 0.0, 1.0)
             
                 if self.quadratic:
-                    self.load_friction_motor_quad = Parameter(0.0, 0.0, 0.05)
-                    self.load_friction_external_quad = Parameter(0.0, 0.0, 0.05)
+                    self.load_friction_quad = Parameter(0.0, 0.0, 0.05)
 
         if self.stribeck:
             # Stribeck velocity [rad/s] and curvature
@@ -112,11 +111,11 @@ class Model():
 
                 if self.quadratic and np.sign(external_torque) != np.sign(motor_torque):
                     if abs(external_torque) < abs(motor_torque):
-                        gearbox_torque2 = self.load_friction_external_quad.value * abs(external_torque)**2
+                        gearbox_torque2 = abs(external_torque)**2
                     else:
-                        gearbox_torque2 = self.load_friction_motor_quad.value * abs(motor_torque)**2
+                        gearbox_torque2 = abs(motor_torque)**2
 
-                    frictionloss += gearbox_torque2 * stribeck_coeff
+                    frictionloss += self.load_friction_quad.value * gearbox_torque2 * stribeck_coeff
 
         # Viscous friction
         damping = self.friction_viscous.value
