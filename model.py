@@ -3,7 +3,8 @@ import json
 from actuator import Actuator, actuators
 from parameter import Parameter
 
-class Model():
+
+class Model:
     def __init__(
         self,
         load_dependent: bool = False,
@@ -43,7 +44,9 @@ class Model():
         if self.load_dependent:
             if self.directional:
                 self.load_friction_motor = Parameter(0.05, 0.0, self.max_load_friction)
-                self.load_friction_external = Parameter(0.05, 0.0, self.max_load_friction)
+                self.load_friction_external = Parameter(
+                    0.05, 0.0, self.max_load_friction
+                )
             else:
                 self.load_friction_base = Parameter(0.05, 0.0, self.max_load_friction)
 
@@ -53,10 +56,9 @@ class Model():
                     self.load_friction_external_stribeck = Parameter(0.05, 0.0, 1.0)
                 else:
                     self.load_friction_stribeck = Parameter(0.05, 0.0, 1.0)
-            
+
                 if self.quadratic:
-                    self.load_friction_motor_quad = Parameter(0.0, 0.0, 0.05)
-                    self.load_friction_external_quad = Parameter(0.0, 0.0, 0.05)
+                    self.load_friction_product = Parameter(0.0, 0.0, 0.05)
 
         if self.stribeck:
             # Stribeck velocity [rad/s] and curvature
@@ -111,12 +113,11 @@ class Model():
                     )
 
                 if self.quadratic and np.sign(external_torque) != np.sign(motor_torque):
-                    if abs(external_torque) < abs(motor_torque):
-                        gearbox_torque2 = self.load_friction_external_quad.value * abs(external_torque)**2
-                    else:
-                        gearbox_torque2 = self.load_friction_motor_quad.value * abs(motor_torque)**2
-
-                    frictionloss += gearbox_torque2 * stribeck_coeff
+                    frictionloss += (
+                        self.load_friction_product.value
+                        * stribeck_coeff
+                        * abs(motor_torque * external_torque)
+                    )
 
         # Viscous friction
         damping = self.friction_viscous.value
@@ -161,6 +162,7 @@ class Model():
 class DummyModel(Model):
     def __init__(self):
         super().__init__()
+
 
 models = {
     "m1": lambda: Model(name="m1"),
