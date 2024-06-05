@@ -134,7 +134,7 @@ class Model:
                         )
                         frictionloss += (
                             stribeck_coeff
-                            + self.load_friction_motor_quad_stribeck.value
+                            * self.load_friction_motor_quad_stribeck.value
                             * abs(motor_torque) ** 2
                         )
 
