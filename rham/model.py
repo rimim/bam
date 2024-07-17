@@ -23,7 +23,7 @@ class Model:
         self.stribeck: bool = stribeck
         self.quadratic: bool = quadratic
 
-        self.max_friction_base = 0.2
+        self.max_friction_base = 0.5
         self.max_load_friction = 0.5
         self.max_viscous_friction = 1.0
 
@@ -174,21 +174,21 @@ class DummyModel(Model):
 
 
 models = {
-    "m1": lambda: Model(name="m1", title="Coulomb (M1)"),
-    "m2": lambda: Model(name="m2", stribeck=True, title="Stribeck (M2)"),
-    "m3": lambda: Model(name="m3", load_dependent=True, title="Load-dependent (M3)"),
+    "m1": lambda: Model(name="m1", title="$\mathcal{M}_1$"),
+    "m2": lambda: Model(name="m2", stribeck=True, title="$\mathcal{M}_2$"),
+    "m3": lambda: Model(name="m3", load_dependent=True, title="$\mathcal{M}_3$"),
     "m4": lambda: Model(
         name="m4",
         load_dependent=True,
         stribeck=True,
-        title="Stribeck load-dependent (M4)",
+        title="$\mathcal{M}_4$",
     ),
     "m5": lambda: Model(
         name="m5",
         load_dependent=True,
         stribeck=True,
         directional=True,
-        title="Stribeck load-dependent directional (M5)",
+        title="$\mathcal{M}_5$",
     ),
     "m6": lambda: Model(
         name="m6",
@@ -196,10 +196,9 @@ models = {
         stribeck=True,
         directional=True,
         quadratic=True,
-        title="Stribeck load-dependent directional quadratic (M6)",
+        title="$\mathcal{M}_6$",
     ),
 }
-
 
 def load_model(json_file: str):
     with open(json_file) as f:
