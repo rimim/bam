@@ -124,7 +124,7 @@ class MXActuator(Actuator):
     Represents a Dynamixel MX-64 or MX-106 actuator
     """
 
-    def __init__(self, testbench_class: Testbench):
+    def __init__(self, testbench_class: Testbench, fix_R = False):
         super().__init__(testbench_class)
 
         # Input voltage and (firmware) gain
@@ -137,6 +137,8 @@ class MXActuator(Actuator):
 
         # Maximum allowable duty cycle, also determined with oscilloscope
         self.max_pwm = 0.9625
+
+        self.fix_R = fix_R
 
     def load_log(self, log: dict):
         super().load_log(log)
@@ -151,7 +153,7 @@ class MXActuator(Actuator):
         self.model.kt = Parameter(1.6, 1.0, 3.0)
 
         # Motor resistance [Ohm]
-        self.model.R = Parameter(2.0, 1.0, 5.0)
+        self.model.R = Parameter(2.5, 1.0, 5.0, optimize=not self.fix_R)
 
         # Motor armature / apparent inertia [kg m^2]
         self.model.armature = Parameter(0.005, 0.001, 0.05)
@@ -250,6 +252,7 @@ class LinearActuator(Actuator):
 actuators = {
     "mx64": lambda: MXActuator(Pendulum),
     "mx106_noLD": lambda: MXActuator(Pendulum),
+    "mx106_noLD_R": lambda: MXActuator(Pendulum, fix_R=True),
     "linear": lambda: LinearActuator(Pendulum),
     "erob80_100": lambda: Erob(Pendulum),
 }
