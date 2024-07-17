@@ -249,7 +249,7 @@ class LinearActuator(Actuator):
 
 actuators = {
     "mx64": lambda: MXActuator(Pendulum),
-    "mx106": lambda: MXActuator(Pendulum),
+    "mx106_noLD": lambda: MXActuator(Pendulum),
     "linear": lambda: LinearActuator(Pendulum),
     "erob80_100": lambda: Erob(Pendulum),
 }

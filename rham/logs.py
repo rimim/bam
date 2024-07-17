@@ -14,10 +14,11 @@ class Logs:
         for json_file in self.json_files:
             with open(json_file) as f:
                 data = json.load(f)
-                data["filename"] = json_file
-                if "arm_mass" not in data:
-                    data["arm_mass"] = 0.0
-                self.logs.append(data)
+                if data["trajectory"] != "lift_and_drop":
+                    data["filename"] = json_file
+                    if "arm_mass" not in data:
+                        data["arm_mass"] = 0.0
+                    self.logs.append(data)
 
     def split(self, selector_kp: int) -> "Logs":
         """
