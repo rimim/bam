@@ -1,3 +1,11 @@
+## Installation 
+
+Install uv
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
 # BAM: Better Actuator Models
 
 <img align="left" src="https://github.com/user-attachments/assets/be9176e3-2aa7-4476-9d2b-88ffca177eb1" height=410>

@@ -1,4 +1,5 @@
 **/__pycache__
+.venv/*
 trash/
 data/
 **.pyc
@@ -7,3 +8,8 @@ params.json
 build/
 dist/
 bam.egg-info/
+uv.lock
+mujoco_rig/**/scene_bam.xml
+mujoco_rig/**/scene_mujoco.xml
+wheels/*.whl
+actuator_*_plot.png

@@ -228,7 +228,7 @@ def load_model(json_file: str):
     
 def load_model_from_dict(data: dict):
     model = models[data["model"]]()
-    model.set_actuator(actuators[data["actuator"]]())
     model.actuator_name = data["actuator"]
+    model.set_actuator(actuators[model.actuator_name]())
     model.load_parameters_from_dict(data)
     return model

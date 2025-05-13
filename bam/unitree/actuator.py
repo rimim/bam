@@ -28,6 +28,8 @@ class UnitreeGo1Actuator(Actuator):
         self.model.max_load_friction = 2.0
         self.model.max_viscous_friction = 1.0
 
+        self.kp = 10
+
     def load_log(self, log: dict):
         super().load_log(log)
 

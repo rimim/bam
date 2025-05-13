@@ -1,0 +1,63 @@
+<mujoco model="Better Actuator Models">
+	<compiler angle="radian" meshdir="meshes" eulerseq="zyx"/>
+	<default>
+	    <geom contype="0" conaffinity="0"/>
+	    <default class="MOTOR">
+	    	<MOTORCLASS/>
+	    </default>
+	</default>
+	<visual>
+		<headlight diffuse="0.6 0.6 0.6" ambient="0.3 0.3 0.3" specular="0 0 0" />
+		<rgba haze="0.15 0.25 0.35 1" />
+		<global azimuth="150" elevation="-20" />
+	</visual>
+	<asset>
+	    <mesh name="motor_holder" file="motor_holder.stl"/>
+	    <mesh name="wj-wk00-0123middlecase_56" file="wj-wk00-0123middlecase_56.stl"/>
+	    <mesh name="drive_palonier" file="drive_palonier.stl"/>
+	    <mesh name="wj-wk00-0124bottomcase_45" file="wj-wk00-0124bottomcase_45.stl"/>
+	    <mesh name="wj-wk00-0122topcabinetcase_95" file="wj-wk00-0122topcabinetcase_95.stl"/>
+	    <mesh name="passive_palonier" file="passive_palonier.stl"/>
+	    <mesh name="right_sheet" file="right_sheet.stl"/>
+	    <mesh name="axle" file="axle.stl"/>
+	    <mesh name="weight" file="weight.stl"/>
+	    <mesh name="spacer_2" file="spacer_2.stl"/>
+		<texture type="skybox" builtin="gradient" rgb1="0.3 0.5 0.7" rgb2="0 0 0" width="512" height="3072" />
+		<texture type="2d" name="groundplane" builtin="checker" mark="edge" rgb1="0.2 0.3 0.4" rgb2="0.1 0.2 0.3" markrgb="0.8 0.8 0.8" width="300" height="300" />
+		<material name="groundplane" texture="groundplane" texuniform="true" texrepeat="5 5" reflectance="0.2" />
+	</asset>
+	<worldbody>
+		<light pos="0 0 3" dir="0 0 -1" directional="false" />
+		<body name="floor">
+			<geom pos="0 0 0" name="floor" size="0 0 .125" type="plane" material="groundplane" conaffinity="1" contype="1" />
+		</body>
+	    <body pos="0 0 0.5">
+	      <geom pos="0.00937659 -0.0321502 0.0193068" type="mesh" rgba="0.615686 0.811765 0.929412 1" mesh="motor_holder"/>
+	      <geom pos="0.00937659 -0.0417502 0.0447418" quat="0 -0.707107 0 -0.707107" type="mesh"
+	        rgba="0.247059 0.243137 0.243137 1" mesh="wj-wk00-0123middlecase_56"/>
+	      <geom pos="0.00937659 -0.0417502 0.0447418" quat="0 -0.707107 0 -0.707107" type="mesh"
+	        rgba="0.623529 0.666667 0.701961 1" mesh="drive_palonier"/>
+	      <geom pos="0.00937659 -0.0417502 0.0447418" quat="0 -0.707107 0 -0.707107" type="mesh"
+	        rgba="0.247059 0.243137 0.243137 1" mesh="wj-wk00-0124bottomcase_45"/>
+	      <geom pos="0.00937659 -0.0417502 0.0447418" quat="0 -0.707107 0 -0.707107" type="mesh"
+	        rgba="0.247059 0.243137 0.243137 1" mesh="wj-wk00-0122topcabinetcase_95"/>
+	      <geom pos="0.00937659 -0.0446502 0.0447418" quat="0 -0.707107 0 -0.707107" type="mesh"
+	        rgba="0.623529 0.666667 0.701961 1" mesh="passive_palonier"/>
+	      <body name="right_sheet" pos="0.00937659 -0.0512002 0.0192418" quat="0.707107 -0.707107 0 0">
+	        <inertial pos="0 0.148197 0.0165321" quat="0.493802 0.506122 -0.506122 0.493802" mass=<WEIGHT/>
+	          diaginertia="0.0034049 0.00190902 0.00170168"/>
+	        <joint class="MOTOR" name="MOTOR" pos="0 0 0" axis="0 0 -1" range="-inf inf"/>
+	        <geom pos="0 0 0.01905" quat="0.707107 0.707107 0 0" type="mesh" rgba="0.647059 0.647059 0.647059 1"
+	          mesh="right_sheet"/>
+	        <geom pos="0 0 0.017" quat="0.707107 0.707107 0 0" type="mesh" rgba="0.231373 0.380392 0.705882 1" mesh="axle"/>
+	        <geom pos="0 0 0.0173" quat="0.707107 0.707107 0 0" type="mesh" rgba="0.972549 0.529412 0.00392157 1"
+	          mesh="weight"/>
+	        <geom pos="0 0 -0.00695" quat="0.707107 0.707107 0 0" type="mesh" rgba="0.768627 0.886275 0.952941 1"
+	          mesh="spacer_2"/>
+	      </body>
+	    </body>
+	</worldbody>
+	<actuator>
+    	<MOTOR/>
+  	</actuator>
+</mujoco>
